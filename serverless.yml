@@ -11,5 +11,5 @@ functions:
     package:
       include:
         - package.json    
-        - *.js             # Include JavaScript files in the root directory
+        - index.js             # Include JavaScript files in the root directory
         - serverless.yml   # Include the serverless.yml file
