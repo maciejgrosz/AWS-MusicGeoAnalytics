@@ -23,7 +23,7 @@ resource "aws_lambda_function" "soundcloud-backend" {
   function_name = "app"
   role          = aws_iam_role.lambda.arn
   handler       = "index.handler"
-  runtime       = "nodejs18.x"
+  runtime       = "nodejs16.x"
 
   }
 
