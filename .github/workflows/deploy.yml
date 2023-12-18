@@ -13,16 +13,11 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '18'
-
-      - name: Install dependencies
-        run: npm install
-
       - name: Deploy Lambda
-        run: npx serverless deploy
+        run: |
+          zip -r function.zip package.json index.js   
+          aws lambda update-function-code --function-name app --zip-file fileb://./function.zip
+          rm -rf function.zip
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

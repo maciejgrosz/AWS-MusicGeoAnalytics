@@ -41,7 +41,7 @@ exports.handler = async (event) => {
     const randomValue = await getRandomValueFromDynamoDB();
 
     // Replace the placeholder with the random value
-    const modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value: ${randomValue}`);
+    const modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value1: ${randomValue}`);
 
     // Return the modified HTML content with appropriate Content-Type
     const response = {
