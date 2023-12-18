@@ -1,0 +1,15 @@
+service: my-lambda-service
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  region: eu-west-1
+
+functions:
+  app:
+    handler: index.handler 
+    package:
+      include:
+        - package.json    
+        - *.js             # Include JavaScript files in the root directory
+        - serverless.yml   # Include the serverless.yml file
