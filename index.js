@@ -54,7 +54,11 @@ const includeLeafletScript = (html, leafletScriptContent) => {
   // If </body> tag is not found, simply append the script content to the end
   return html + leafletScriptContent;
 };
-
+// Function to replace the placeholder with Leaflet script
+const replaceLeafletScriptPlaceholder = (html, leafletScriptContent) => {
+  const placeholder = 'LEAFLET_SCRIPT';
+  return html.replace(placeholder, leafletScriptContent);
+};
 
 // Main Lambda handler
 exports.handler = async (event) => {
@@ -65,7 +69,7 @@ exports.handler = async (event) => {
     // Replace the placeholder with the random value
     let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value: ${randomValue}`);
     // Include Leaflet script dynamically
-    modifiedHtml = includeLeafletScript(modifiedHtml, leafletScriptContent)
+    modifiedHtml = replaceLeafletScriptPlaceholder(modifiedHtml, leafletScriptContent);
     console.log('modifiedHtml: ', modifiedHtml);  
     // Return the modified HTML content with appropriate Content-Type
     const response = {
