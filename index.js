@@ -65,6 +65,8 @@ exports.handler = async (event) => {
     console.log('leafletScriptContent: ', leafletScriptContent);  
     // Replace the placeholder with the random value
     let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value: ${randomValue}`);
+    // Include Leaflet script dynamically
+    modifiedHtml = includeLeafletScript(modifiedHtml, leafletScriptContent);
 
     // Return the modified HTML content with appropriate Content-Type
     const response = {
@@ -72,8 +74,7 @@ exports.handler = async (event) => {
       headers: {
         'Content-Type': 'text/html',
       },
-      body: modifiedHtml,
-      leafletScriptContent, // Include the Leaflet script as a separate property in the response
+      body: modifiedHtml
     };
 
     return response;
