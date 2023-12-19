@@ -16,6 +16,7 @@
             height: 100%;
             margin: 0;
             padding: 0;
+            overflow: hidden; /* Prevent scrolling */
         }
 
         body {
@@ -36,6 +37,7 @@
         main {
             display: flex;
             flex: 1;
+            overflow: hidden; /* Prevent scrolling */
         }
 
         #countryPanel {
@@ -44,6 +46,7 @@
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            overflow-y: auto; /* Enable scrolling for the country panel */
         }
 
         #map {
@@ -102,17 +105,6 @@
         </div>
         <div id="map"></div>
     </main>
-    <div id="musicPreferences">
-        <h2>Music Preferences</h2>
-        <!-- Music preferences section goes here -->
-        <p>Popular Genres:</p>
-        <ul>
-            <li>Pop</li>
-            <li>Rock</li>
-            <li>Hip-Hop</li>
-        </ul>
-        <!-- Add more details about music preferences -->
-    </div>
     <script>LEAFLET_SCRIPT</script>
 </body>
 </html>
