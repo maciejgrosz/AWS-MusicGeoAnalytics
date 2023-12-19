@@ -62,12 +62,11 @@ exports.handler = async (event) => {
     const s3Object = await fetchS3Object();
     const randomValue = await getRandomValueFromDynamoDB();
     const leafletScriptContent = await readLeafletScript();
-    console.log('leafletScriptContent: ', leafletScriptContent);  
     // Replace the placeholder with the random value
     let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value: ${randomValue}`);
     // Include Leaflet script dynamically
-    modifiedHtml = includeLeafletScript(modifiedHtml, leafletScriptContent);
-
+    modifiedHtml = includeLeafletScript(modifiedHtml, leafletScriptContent)
+    console.log('modifiedHtml: ', modifiedHtml);  
     // Return the modified HTML content with appropriate Content-Type
     const response = {
       statusCode: 200,
