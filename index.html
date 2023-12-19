@@ -74,7 +74,34 @@
             margin-top: 20px;
             text-align: center;
         }
+
+        #genreDropdowns {
+           display: none;
+        }
+        /* Add some spacing between the button and the label */
+        .button-container {
+            margin-top: 10px; /* Adjust the value as needed */
+        }
     </style>
+    <script>
+      function toggleDropdowns() {
+        var regionRadio = document.getElementById('regionRadio');
+        var genreRadio = document.getElementById('genreRadio');
+        var countryDropdowns = document.getElementById('countryDropdowns');
+        var genreDropdown = document.getElementById('genreDropdowns');
+
+        // Toggle the visibility of country dropdowns based on the selected radio button
+        countryDropdowns.style.display = regionRadio.checked ? 'block' : 'none';
+
+        // Toggle the visibility of genre dropdown based on the selected radio button
+        genreDropdown.style.display = genreRadio.checked ? 'block' : 'none';
+
+        // Ensure the genre dropdown is visible when switching to "Genre analysis"
+        if (genreRadio.checked) {
+            genreDropdown.style.display = 'block';
+        }
+    }
+    </script>
 </head>
 <body>
     <header>
@@ -82,16 +109,21 @@
     </header>
     <main>
         <div id="countryPanel">
+            <label>
+                <input type="radio" name="analysisOption" id="regionRadio" onclick="toggleDropdowns()" checked> Compare regions
+            </label>
+            <label>
+                <input type="radio" name="analysisOption" id="genreRadio" onclick="toggleDropdowns()"> Genre analysis
+            </label>
             <h2>Select Countries to Compare</h2>
             <form>
+              <div id="countryDropdowns">
                 <label for="countryList1">Country 1:</label>
                 <select id="countryList1">
                     <!-- Country options go here -->
                     <option value="poland">Poland</option>
                     <option value="usa">USA</option>
                     <option value="uk">UK</option>
-                    <option value="russia">RUS</option>
-
                     <!-- Add more country options as needed -->
                 </select>
                 <label for="countryList2">Country 2:</label>
@@ -102,8 +134,25 @@
                     <option value="italy">Italy</option>
                     <!-- Add more country options as needed -->
                 </select>
-                <button type="submit">Compare</button>
-            </form>
+              </div>
+
+              <!-- Container for country dropdowns -->
+              <div id="genreDropdowns">
+          
+                  <label for="musicGenre">Genre:</label>
+                  <select id="musicGenre">
+                      <!-- Country options go here -->
+                      <option value="pop">Pop</option>
+                      <option value="rock">Rock</option>
+                      <option value="techno">Techno</option>
+                      <!-- Add more country options as needed -->
+                  </select>
+              </div>
+          
+              <div class="button-container">
+                  <button type="submit">Compare</button>
+              </div>
+          </form>
         </div>
         <div id="map"></div>
     </main>
