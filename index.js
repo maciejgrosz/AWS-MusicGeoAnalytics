@@ -58,6 +58,9 @@ exports.handler = async (event) => {
     // Include Leaflet script dynamically
     modifiedHtml = includeLeafletScript(modifiedHtml, leafletScriptContent);
 
+    // Log the modified HTML content
+    console.log('Modified HTML:', modifiedHtml);
+
     // Return the modified HTML content with appropriate Content-Type
     const response = {
       statusCode: 200,
