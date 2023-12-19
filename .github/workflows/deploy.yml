@@ -29,6 +29,6 @@ jobs:
     - name: Deploy Lambda
       run: |
         aws s3 cp index.html s3://tass-musicgeoanalyser/
-        zip -r function.zip package.json index.js 
+        zip -r function.zip package.json index.js leaflet.js
         aws lambda update-function-code --function-name app --zip-file fileb://./function.zip
         rm -rf function.zip
