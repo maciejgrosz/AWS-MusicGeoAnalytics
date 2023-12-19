@@ -11,11 +11,6 @@ const fetchS3Object = async () => {
   }).promise();
 };
 
-// Function to read the contents of the Leaflet script file
-const readLeafletScript = async () => {
-  return fs.promises.readFile('./leaflet.js', 'utf-8');
-};
-
 // Function to query DynamoDB and get a random value
 const getRandomValueFromDynamoDB = async () => {
   const getItemParams = {
@@ -40,20 +35,11 @@ const getRandomValueFromDynamoDB = async () => {
   return randomValue;
 };
 
-// Function to dynamically include Leaflet script
-const includeLeafletScript = (html, leafletScriptContent) => {
-  // Find the position of the closing </body> tag
-  const bodyClosingTagIndex = html.indexOf('</body>');
-
-  // Check if </body> tag is found
-  if (bodyClosingTagIndex !== -1) {
-    // Insert the Leaflet script content before </body>
-    return html.slice(0, bodyClosingTagIndex) + leafletScriptContent + html.slice(bodyClosingTagIndex);
-  }
-
-  // If </body> tag is not found, simply append the script content to the end
-  return html + leafletScriptContent;
+// Function to read the contents of the Leaflet script file
+const readLeafletScript = async () => {
+  return fs.promises.readFile('./leaflet.js', 'utf-8');
 };
+
 // Function to replace the placeholder with Leaflet script
 const replaceLeafletScriptPlaceholder = (html, leafletScriptContent) => {
   const placeholder = 'LEAFLET_SCRIPT';
