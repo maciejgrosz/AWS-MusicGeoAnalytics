@@ -3,17 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+    integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+    crossorigin=""/>
+    <!-- Make sure you put this AFTER Leaflet's CSS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+    integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
+    crossorigin=""></script>
     <title>MusicGeoAnalyzer</title>
     <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             font-family: 'Arial', sans-serif;
             background-color: #f4f4f4;
-            margin: 0;
-            padding: 0;
             color: #333;
             display: flex;
             flex-direction: column;
-            align-items: center;
         }
 
         header {
@@ -21,27 +31,24 @@
             color: #fff;
             text-align: center;
             padding: 1em;
-            width: 100%;
         }
 
         main {
             display: flex;
-            margin: 20px 0;
+            flex: 1;
         }
 
         #countryPanel {
-            width: 50%;
+            width: 30%;
             padding: 20px;
             background-color: #fff;
             border-radius: 5px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            margin-right: 10px;
         }
 
         #map {
-            width: 100%;
-            height: 400px;
-            margin-bottom: 20px;
+            flex: 1;
+            height: 100vh;
         }
 
         select {
@@ -65,8 +72,6 @@
             text-align: center;
         }
     </style>
-    <!-- Include Leaflet script dynamically -->
-    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 </head>
 <body>
     <header>
