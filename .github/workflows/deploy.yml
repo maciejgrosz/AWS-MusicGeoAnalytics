@@ -1,4 +1,4 @@
-name: Deploy Lambda & s3
+name: Deploy Lambda & S3
 
 on:
   push:
@@ -22,13 +22,21 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-region: eu-west-1 # Modify this to your desired AWS region
 
-    # - name: Print changed files # To properly debug what is being deployed (It can be removed).
-    #   run: |
-    #     echo "List of changed files:" 
-    #     echo $(git diff --name-only HEAD^ HEAD)
-    - name: Deploy Lambda
+    - name: Check Changed Files
+      id: check_changes
       run: |
-        aws s3 cp index.html s3://tass-musicgeoanalyser/
+        CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+        echo "Changed files: $CHANGED_FILES"
+        echo "::set-output name=changed_files::$CHANGED_FILES"
+
+    - name: Deploy Lambda
+      if: contains(steps.check_changes.outputs.changed_files, 'package.json') || contains(steps.check_changes.outputs.changed_files, 'index.js') || contains(steps.check_changes.outputs.changed_files, 'leaflet.js')
+      run: |
         zip -r function.zip package.json index.js leaflet.js
         aws lambda update-function-code --function-name app --zip-file fileb://./function.zip
         rm -rf function.zip
+
+    - name: Deploy HTML to S3
+      if: contains(steps.check_changes.outputs.changed_files, 'index.html')
+      run: |
+        aws s3 cp index.html s3://tass-musicgeoanalyser/
