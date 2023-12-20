@@ -10,6 +10,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
     integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
     crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/handlebars@4.7.7/dist/handlebars.min.js"></script>
     <title>MusicGeoAnalyzer</title>
     <style>
         body, html {
@@ -75,20 +76,29 @@
             text-align: center;
         }
 
-        #genreDropdowns {
+        #musicGenre {
            display: none;
         }
         /* Add some spacing between the button and the label */
         .button-container {
             margin-top: 10px; /* Adjust the value as needed */
         }
+
+        #resultBox {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
     </style>
     <script>
       function toggleDropdowns() {
         var regionRadio = document.getElementById('regionRadio');
         var genreRadio = document.getElementById('genreRadio');
-        var countryDropdowns = document.getElementById('countryDropdowns');
-        var genreDropdown = document.getElementById('genreDropdowns');
+        var countryDropdowns = document.getElementById('countryContainer');
+        var genreDropdown = document.getElementById('genreContainer');
 
         // Toggle the visibility of country dropdowns based on the selected radio button
         countryDropdowns.style.display = regionRadio.checked ? 'block' : 'none';
@@ -101,6 +111,17 @@
             genreDropdown.style.display = 'block';
         }
     }
+    function compare() {
+        // This is a placeholder function for your comparison logic
+        // You can replace it with the actual logic to compare selected options
+        var country1 = document.getElementById('countryList1').value;
+        var country2 = document.getElementById('countryList2').value;
+        var genre = document.getElementById('musicGenreDropdown').value;
+
+        // Perform the comparison and display the result
+        var result = "Comparison Result: " + country1 + " vs " + country2 + " in genre " + genre;
+        document.getElementById('resultBox').innerText = result;
+      }
     </script>
 </head>
 <body>
@@ -115,45 +136,69 @@
             <label>
                 <input type="radio" name="analysisOption" id="genreRadio" onclick="toggleDropdowns()"> Genre analysis
             </label>
-             <form>
-              <div id="countryDropdowns">
-                <h2>Select Countries to Compare</h2>
-                <label for="countryList1">Country 1:</label>
-                <select id="countryList1">
-                    <!-- Country options go here -->
-                    <option value="poland">Poland</option>
-                    <option value="usa">USA</option>
-                    <option value="uk">UK</option>
-                    <!-- Add more country options as needed -->
-                </select>
-                <label for="countryList2">Country 2:</label>
-                <select id="countryList2">
-                    <!-- Country options go here -->
-                    <option value="germany">Germany</option>
-                    <option value="france">France</option>
-                    <option value="italy">Italy</option>
-                    <!-- Add more country options as needed -->
-                </select>
-              </div>
-              <!-- Container for country dropdowns -->
-              <div id="genreDropdowns">
-                <h2>Select Genre to Analyse</h2>
-                  <label for="musicGenre">Genre:</label>
-                  <select id="musicGenre">
-                      <!-- Country options go here -->
-                      <option value="pop">Pop</option>
-                      <option value="rock">Rock</option>
-                      <option value="techno">Techno</option>
-                      <!-- Add more country options as needed -->
+              <!-- Your Handlebars.js template -->
+              <script id="my-template" type="text/x-handlebars-template">
+                <div id="countryContainer">
+                  <h2>Select Countries to Compare</h2>
+                  <label for="countryList1">Country 1:</label>
+                  <select id="countryList1">
+                      {{#each countries}}
+                          <option value="{{ this }}">{{ this }}</option>
+                      {{/each}}
                   </select>
-              </div>
-              <div class="button-container">
-                  <button type="submit">Compare</button>
-              </div>
-          </form>
-        </div>
+                  <label for="countryList2">Country 2:</label>
+                  <select id="countryList2">
+                      {{#each countries}}
+                          <option value="{{ this }}">{{ this }}</option>
+                      {{/each}}
+                  </select>
+                </div>
+
+                <!-- Container for country dropdowns -->
+                <div id="genreContainer">
+                  <h2>Select genre to analyse</h2>
+                    <label for="musicGenre">Genre:</label>
+                    <select id="musicGenreDropdown">
+                        {{#each genres}}
+                            <option value="{{ this }}">{{ this }}</option>
+                        {{/each}}
+                    </select>
+                </div>
+
+                <div class="button-container">
+                    <button type="button" onclick="compare()">Compare</button>
+                </div>
+                <div id="resultBox"></div>
+              </script>
+              <!-- End of Handlebars.js template -->
+            </div>
         <div id="map"></div>
+
     </main>
     <script>LEAFLET_SCRIPT</script>
+    <script>
+      // JavaScript to render the Handlebars.js template
+      document.addEventListener("DOMContentLoaded", function() {
+          // Data to be inserted into the template
+          var data = {
+              countries: ["Poland", "USA", "UK", "Germany", "France", "Italy"],
+              genres: ["Pop", "Rock", "Techno"]
+          };
+
+          // Get the template source
+          var templateSource = document.getElementById("my-template").innerHTML;
+
+          // Compile the template
+          var template = Handlebars.compile(templateSource);
+
+          // Render the template with the data
+          var renderedHTML = template(data);
+
+          // Insert the rendered HTML into the DOM
+          document.getElementById("countryPanel").innerHTML += renderedHTML;
+          toggleDropdowns();
+
+      });
+  </script>
 </body>
 </html>
