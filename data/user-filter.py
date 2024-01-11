@@ -4,16 +4,15 @@ import json
 with open('merged_data.json', 'r', encoding='utf-8') as json_file:
     user_info_data = json.load(json_file)
 
-# Create a new list to store the filtered user data
-filtered_users = []
+# Function to filter users with non-empty 'savedLikes'
+def filter_users(city_users):
+    return [user for user in city_users if 'savedLikes' in user and user['savedLikes']]
 
-# Iterate through the user information data
-for city_data in user_info_data['PL']['Mazowsze']['warsaw']:
-    if 'savedLikes' in city_data and city_data['savedLikes']:
-        filtered_users.append(city_data)
-
-# Update the user information data with the filtered list
-user_info_data['PL']['Mazowsze']['warsaw'] = filtered_users
+# Iterate through the entire data structure and apply the filter
+for country, regions in user_info_data.items():
+    for region, cities in regions.items():
+        for city, users in cities.items():
+            user_info_data[country][region][city] = filter_users(users)
 
 # Save the cleaned JSON data to 'clean-data.json'
 with open('clean-data.json', 'w', encoding='utf-8') as json_file:
