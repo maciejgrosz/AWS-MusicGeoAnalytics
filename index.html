@@ -126,7 +126,7 @@
 </head>
 <body>
     <header>
-        <h1>REPLACE_WITH_RECORDS</h1>
+        <h1 id="genreHeader">Loading genres...</h1> 
     </header>
     <main>
         <div id="countryPanel">
@@ -199,6 +199,26 @@
           toggleDropdowns();
 
       });
+  </script>
+  <script>
+    // Fetches the top genres and updates the header
+    function fetchTopGenresAndUpdateHeader() {
+      const apiEndpoint = 'https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/warsaw';
+      
+      fetch(apiEndpoint)
+        .then(response => response.json())
+        .then(genres => {
+          // Assuming 'genres' is an array of genre objects
+          const topGenresText = genres.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
+          document.getElementById('genreHeader').innerText = `Top Genres in Warsaw: ${topGenresText}`;
+        })
+        .catch(error => {
+          console.error('Error fetching genre data:', error);
+          document.getElementById('genreHeader').innerText = 'Error loading genres';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', fetchTopGenresAndUpdateHeader);
   </script>
 </body>
 </html>
