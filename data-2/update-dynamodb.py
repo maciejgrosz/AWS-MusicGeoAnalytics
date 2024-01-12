@@ -1,27 +1,36 @@
 import json
 import boto3
 
-# Set up a session with the sandbox profile
+# Initialize a DynamoDB client with the 'sandbox' profile
 session = boto3.Session(profile_name='sandbox')
+dynamodb = session.resource('dynamodb')
 
-# Initialize a DynamoDB client using the specified session
-dynamodb = session.resource('dynamodb', region_name='eu-west-1')
-table = dynamodb.Table('Users')
+# Specify the DynamoDB table name
+table_name = 'CityGenres'
+table = dynamodb.Table(table_name)
 
 # Load the JSON data
-with open('final_data_PL.json', 'r', encoding='utf-8') as file:
-    users_data = json.load(file)
+with open('data_sorted.json', 'r', encoding='utf-8') as file:
+    city_genres_data = json.load(file)
 
-# Function to upload a batch of items
-def batch_write(items):
-    with table.batch_writer() as batch:
-        for item in items:
-            batch.put_item(Item=item)
+# Function to upload data to DynamoDB
+def upload_to_dynamodb(city, genres):
+    try:
+        response = table.put_item(
+            Item={
+                'city': city,
+                'genres': genres
+            }
+        )
+        return response
+    except Exception as e:
+        print(f"Error uploading {city}: {str(e)}")
+        return None
 
-# Process the data in batches of 25 items
-batch_size = 25
-for i in range(0, len(users_data), batch_size):
-    batch = users_data[i:i + batch_size]
-    batch_write(batch)
+# Upload each city's data to DynamoDB
+for city, genres in city_genres_data.items():
+    result = upload_to_dynamodb(city, genres)
+    if result:
+        print(f"Uploaded data for city: {city}")
 
-print("Data upload completed.")
+print("Data upload process completed.")
