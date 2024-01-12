@@ -2,7 +2,7 @@ import json
 from collections import defaultdict
 
 # Load the original JSON data
-with open('final_data_PL.json', 'r', encoding='utf-8') as file:
+with open('final_data_GB.json', 'r', encoding='utf-8') as file:
     users_data = json.load(file)
 
 # Initialize a dictionary to store the count of users per genre for each city

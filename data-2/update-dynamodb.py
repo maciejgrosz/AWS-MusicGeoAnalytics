@@ -9,8 +9,9 @@ dynamodb = session.resource('dynamodb')
 table_name = 'CityGenres'
 table = dynamodb.Table(table_name)
 
-# Load the JSON data
-with open('data_sorted.json', 'r', encoding='utf-8') as file:
+# Load the JSON data from the file
+file_name = 'data_sorted-pl-uploaded.json'
+with open(file_name, 'r', encoding='utf-8') as file:
     city_genres_data = json.load(file)
 
 # Function to upload data to DynamoDB
