@@ -11,28 +11,27 @@ const fetchS3Object = async () => {
   }).promise();
 };
 
-// Function to query DynamoDB and get a random value
-const getRandomValueFromDynamoDB = async () => {
+const getUserById = async (userId) => {
   const getItemParams = {
-    TableName: 'soundcloud-data',
+    TableName: 'Users', // Ensure this matches your actual DynamoDB table name
     Key: {
-      'Id': { S: 'test' }
+      'id': userId  // Assuming 'id' is the name of your partition key
     }
   };
 
-  const itemResult = await dynamodb.getItem(getItemParams).promise();
-  console.log('itemResult: ', itemResult);
+  try {
+    const itemResult = await dynamodb.get(getItemParams).promise();
+    console.log('Item Result:', itemResult);
 
-  // Check if the item and attribute exist
-  const itemExists = itemResult.Item && itemResult.Item.number;
-
-  // Extract the value if it exists, otherwise set a default value
-  const randomValue = itemExists ? itemResult.Item.number.N : 'N/A';
-
-  // Log the randomValue
-  console.log('Random Value:', randomValue);
-
-  return randomValue;
+    if (itemResult.Item && itemResult.Item.name) {
+      return itemResult.Item.name; // Returns the user's name
+    } else {
+      return 'User not found';
+    }
+  } catch (error) {
+    console.error('Error fetching user from DynamoDB:', error);
+    return 'Error fetching user';
+  }
 };
 
 // Function to read the contents of the Leaflet script file
@@ -50,10 +49,11 @@ const replaceLeafletScriptPlaceholder = (html, leafletScriptContent) => {
 exports.handler = async (event) => {
   try {
     const s3Object = await fetchS3Object();
-    const randomValue = await getRandomValueFromDynamoDB();
+    const userId = 6522323;  // Replace with the actual user ID you want to query
+    const userName = await getUserById(userId);
     const leafletScriptContent = await readLeafletScript();
     // Replace the placeholder with the random value
-    let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RANDOM_NUMBER', `Random Value: ${randomValue}`);
+    let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_NAME', `NAME: ${userName}`);
     // Include Leaflet script dynamically
     modifiedHtml = replaceLeafletScriptPlaceholder(modifiedHtml, leafletScriptContent);
     console.log('modifiedHtml: ', modifiedHtml);  
