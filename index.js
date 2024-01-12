@@ -1,6 +1,6 @@
 const AWS = require('aws-sdk');
 const s3 = new AWS.S3();
-const dynamodb = new AWS.DynamoDB();
+const dynamodb = new AWS.DynamoDB.DocumentClient();
 const fs = require('fs'); // Node.js file system module
 
 // Function to fetch content from S3
@@ -11,26 +11,27 @@ const fetchS3Object = async () => {
   }).promise();
 };
 
-const getUserById = async (userId) => {
-  const getItemParams = {
-    TableName: 'Users', // Ensure this matches your actual DynamoDB table name
-    Key: {
-      'id': userId  // Assuming 'id' is the name of your partition key
-    }
+const getGenresByCity = async (city) => {
+  const queryParams = {
+    TableName: 'CityGenres',
+    KeyConditionExpression: 'city = :city',
+    ExpressionAttributeValues: {
+      ':city': city,
+    },
   };
 
   try {
-    const itemResult = await dynamodb.get(getItemParams).promise();
-    console.log('Item Result:', itemResult);
+    const result = await dynamodb.query(queryParams).promise();
+    console.log('Query Result:', result);
 
-    if (itemResult.Item && itemResult.Item.name) {
-      return itemResult.Item.name; // Returns the user's name
+    if (result.Items) {
+      return result.Items; // Returns an array of records for the specified city
     } else {
-      return 'User not found';
+      return 'No records found for this city';
     }
   } catch (error) {
-    console.error('Error fetching user from DynamoDB:', error);
-    return 'Error fetching user';
+    console.error('Error fetching records from DynamoDB:', error);
+    return 'Error fetching records';
   }
 };
 
@@ -49,11 +50,14 @@ const replaceLeafletScriptPlaceholder = (html, leafletScriptContent) => {
 exports.handler = async (event) => {
   try {
     const s3Object = await fetchS3Object();
-    const userId = 6522323;  // Replace with the actual user ID you want to query
-    const userName = await getUserById(userId);
+    const city = "warsaw";
+    const records = await getGenresByCity(city);
     const leafletScriptContent = await readLeafletScript();
-    // Replace the placeholder with the random value
-    let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_NAME', `NAME: ${userName}`);
+    // Process the retrieved records as needed
+    // For example, you can convert the records to JSON and include them in the response
+
+    // Replace the placeholder with the JSON representation of the records
+    let modifiedHtml = s3Object.Body.toString('utf-8').replace('REPLACE_WITH_RECORDS', JSON.stringify(records));
     // Include Leaflet script dynamically
     modifiedHtml = replaceLeafletScriptPlaceholder(modifiedHtml, leafletScriptContent);
     console.log('modifiedHtml: ', modifiedHtml);  
@@ -76,4 +80,3 @@ exports.handler = async (event) => {
     };
   }
 };
-
