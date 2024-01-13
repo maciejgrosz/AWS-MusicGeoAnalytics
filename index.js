@@ -9,8 +9,13 @@ const regionToCityMapping = {
     "Wielkopolskie": ["poznan"],
     "Pomorskie": ["gdansk", "gdynia"],
     "Malopolskie": ["krakow"],
-    "Podkarpackie": ["rzeszow"]
+    "Podkarpackie": ["rzeszow"],
+    "England": ["london", "birmingham"],
+    "Scotland": ["glasgow", "edinburgh"],
+    "Wales": ["cardiff", "swansea"],
+    "Northern_Ireland": ["belfast", "londonderry"]
   };
+  
 const getGenresByCity = async (city) => {
   const queryParams = {
     TableName: 'CityGenres',

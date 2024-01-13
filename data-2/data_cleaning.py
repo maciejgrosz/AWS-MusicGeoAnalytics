@@ -1,7 +1,7 @@
 import json
 from unidecode import unidecode
 
-data_files = ["saved_users_GB", "saved_likes_GB_small"]
+data_files = ["saved_users_GB", "saved_likes_GB_medium"]
 for data_file in data_files:
     # Load your JSON data
     with open(f'{data_file}.json', 'r', encoding='utf-8') as json_file:

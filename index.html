@@ -143,15 +143,16 @@
         <div id="map"></div>
 
     </main>
+    <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/geo-gb.js"></script>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/geo-poland.js"></script>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/leaflet.js"></script>
     <script> 
         document.addEventListener("DOMContentLoaded", function() {
             // Genres to be inserted into the dropdown
             var genres = [
-                "pop", "rock", "hip-hop", "jazz", "blues", "country", "rnb",
+                "pop", "rock", "jazz", "blues", "country", "rnb",
                 "electronic", "classical", "folk", "reggae", "punk", "metal", "indie", "soul",
-                "funk", "gospel", "alternative", "rap", "edm", "ska",
+                "funk", "gospel", "alternative", "rap/hip-hop", "edm", "ska",
                 "ambient", "dubstep", "techno", "house", "trap", "latin", "disco", 
                 "grunge", "book", "podcast", "trance", "dance", "boogie", "beats", "afrobeat", "phonk"
             ];
@@ -197,8 +198,8 @@
             genresArray.sort((a, b) => b[1] - a[1]);
 
             // Get the top 5 genres
-            const topFiveGenres = genresArray.slice(0, 5).map(item => item[0]);
-            // Check if the selected genre is in the top 5
+            const topFiveGenres = genresArray.slice(0, 10).map(item => item[0]);
+            // Check if the selected genre is in the top 10
             return topFiveGenres.includes(selectedGenre);
         }
 

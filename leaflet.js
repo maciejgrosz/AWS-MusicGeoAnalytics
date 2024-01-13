@@ -21,13 +21,17 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
 
 const regionToCityMapping = {
   "Mazowieckie": ["warsaw"],
-  "Łódzkie": ["lodz"],
-  "Śląskie": ["katowice", "gliwice"],
+  "Lodzkie": ["lodz"],
+  "Slaskie": ["katowice", "gliwice"],
   "Zachodniopomorskie": ["szczecin"],
   "Wielkopolskie": ["poznan"],
   "Pomorskie": ["gdansk", "gdynia"],
-  "Małopolskie": ["krakow"],
-  "Podkarpackie": ["rzeszow"]
+  "Malopolskie": ["krakow"],
+  "Podkarpackie": ["rzeszow"],
+  "England": ["london", "birmingham"],
+  "Scotland": ["glasgow", "edinburgh"],
+  "Wales": ["cardiff", "swansea"],
+  "Northern_Ireland": ["belfast", "londonderry"]
 };
 
 function convertRegionName(regionName) {
@@ -53,6 +57,35 @@ function fetchGenreData(regionName) {
 }
 
 L.geoJSON(geoData, {
+  onEachFeature: function (feature, layer) {
+    const regionName = convertRegionName(feature.properties.NAME_1);
+    regionLayers[regionName] = layer;
+    layer.on('click', function () {
+      fetchGenreData(regionName)
+        .then(genreData => {
+          // Check if genreData is an array and has elements
+          if (Array.isArray(genreData) && genreData.length > 0) {
+            const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
+            layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
+          } else {
+            layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
+          }
+        })
+        .catch(error => {
+          console.error(`Error fetching data for ${regionName}:`, error);
+          layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
+        });
+    });
+  },
+  style: function (feature) {
+    // You can also set a default style for regions here
+    return defaultStyle;
+  }
+}).addTo(map);
+
+
+// Load and add the Great Britain GeoJSON to the map
+L.geoJSON(geoDataGb, {
   onEachFeature: function (feature, layer) {
     const regionName = convertRegionName(feature.properties.NAME_1);
     regionLayers[regionName] = layer;

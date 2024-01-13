@@ -22,7 +22,7 @@ for city, genres in city_genres.items():
     city_genres_sorted[city] = {genre: count for genre, count in sorted_genres}
 
 # Save the transformed data to a new JSON file
-with open('data_sorted.json', 'w', encoding='utf-8') as file:
+with open('data_sorted_GB.json', 'w', encoding='utf-8') as file:
     json.dump(city_genres_sorted, file, ensure_ascii=False, indent=4)
 
 print("Transformed data (sorted by user count per genre) saved to 'data_sorted.json'.")
