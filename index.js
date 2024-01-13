@@ -36,7 +36,7 @@ const getGenresByCity = async (city) => {
 };
 
 
-// Function to get top 5 genres from the dictionary
+// Function to get top 10 genres from the dictionary
 const getTopGenres = (genreDict) => {
   let genres = [];
   
@@ -49,8 +49,8 @@ const getTopGenres = (genreDict) => {
   // Sort genres by count in descending order
   genres.sort((a, b) => b.count - a.count);
 
-  // Return the top 5 genres
-  return genres.slice(0, 5);
+  // Return the top 10 genres
+  return genres.slice(0, 10);
 };
 
 const getAllData = async () => {

@@ -1,42 +1,42 @@
-name: Deploy Lambda & S3
+# name: Deploy Lambda & S3
 
-on:
-  push:
-    branches:
-      - main
+# on:
+#   push:
+#     branches:
+#       - main
     
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
+# jobs:
+#   deploy:
+#     runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v2
-      with:
-        fetch-depth: 2 # To fetch the current commit and its parent (so we can compare)
+#     steps:
+#     - name: Checkout Repository
+#       uses: actions/checkout@v2
+#       with:
+#         fetch-depth: 2 # To fetch the current commit and its parent (so we can compare)
 
-    - name: Setup AWS CLI
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: eu-west-1 # Modify this to your desired AWS region
+#     - name: Setup AWS CLI
+#       uses: aws-actions/configure-aws-credentials@v1
+#       with:
+#         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+#         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+#         aws-region: eu-west-1 # Modify this to your desired AWS region
 
-    - name: Check Changed Files
-      id: check_changes
-      run: |
-        CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
-        echo "Changed files: $CHANGED_FILES"
-        echo "::set-output name=changed_files::$CHANGED_FILES"
+#     - name: Check Changed Files
+#       id: check_changes
+#       run: |
+#         CHANGED_FILES=$(git diff --name-only HEAD^ HEAD)
+#         echo "Changed files: $CHANGED_FILES"
+#         echo "::set-output name=changed_files::$CHANGED_FILES"
 
-    - name: Deploy Lambda
-      if: contains(steps.check_changes.outputs.changed_files, 'package.json') || contains(steps.check_changes.outputs.changed_files, 'index.js') || contains(steps.check_changes.outputs.changed_files, 'leaflet.js')
-      run: |
-        zip -r function.zip package.json index.js leaflet.js
-        aws lambda update-function-code --function-name app --zip-file fileb://./function.zip
-        rm -rf function.zip
+#     - name: Deploy Lambda
+#       if: contains(steps.check_changes.outputs.changed_files, 'package.json') || contains(steps.check_changes.outputs.changed_files, 'index.js') || contains(steps.check_changes.outputs.changed_files, 'leaflet.js')
+#       run: |
+#         zip -r function.zip package.json index.js leaflet.js
+#         aws lambda update-function-code --function-name app --zip-file fileb://./function.zip
+#         rm -rf function.zip
 
-    - name: Deploy HTML to S3
-      if: contains(steps.check_changes.outputs.changed_files, 'index.html')
-      run: |
-        aws s3 cp index.html s3://tass-musicgeoanalyser/
+#     - name: Deploy HTML to S3
+#       if: contains(steps.check_changes.outputs.changed_files, 'index.html')
+#       run: |
+#         aws s3 cp index.html s3://tass-musicgeoanalyser/

@@ -148,7 +148,13 @@
     <script> 
         document.addEventListener("DOMContentLoaded", function() {
             // Genres to be inserted into the dropdown
-            var genres = ["Pop", "Rock", "Techno", "Electronic"];
+            var genres = [
+                "pop", "rock", "hip-hop", "jazz", "blues", "country", "rnb",
+                "electronic", "classical", "folk", "reggae", "punk", "metal", "indie", "soul",
+                "funk", "gospel", "alternative", "rap", "edm", "ska",
+                "ambient", "dubstep", "techno", "house", "trap", "latin", "disco", 
+                "grunge", "book", "podcast", "trance", "dance", "boogie", "beats", "afrobeat", "phonk"
+            ];
     
             // Populate the genre dropdown
             var musicGenreDropdown = document.getElementById("musicGenreDropdown");
@@ -213,8 +219,8 @@
         function highlightRegion(city) {
             // Log the city to be highlighted
             // Map the city to its region and log the region
-            const region = mapCityToRegion(city);
-            console.log(regionLayers)
+            const region_unconverted = mapCityToRegion(city);
+            const region = convertRegionName(region_unconverted);
               // Check if the region layer exists
             if (regionLayers[region]) {
                 // Apply the highlight style to the layer
