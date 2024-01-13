@@ -173,6 +173,14 @@
                 });
             });
         }
+        function fetchAllRegionData() {
+            return fetch('https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/all-data')
+                .then(response => response.json())
+                .catch(error => {
+                    console.error('Error fetching all region data:', error);
+                    return []; // Return an empty array in case of error
+                });
+            }
 
         function isGenreInTopFive(genre, genres) {
             // Implement logic to check if the genre is in the top 5 for the region

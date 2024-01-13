@@ -1,4 +1,5 @@
-var geoData = {
+// https://gadm.org/
+var geoData =  {
    "type":"FeatureCollection",
    "name":"gadm41_POL_1",
    "crs":{

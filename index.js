@@ -43,28 +43,51 @@ const getTopGenres = (genreDict) => {
   return genres.slice(0, 5);
 };
 
+const getAllData = async () => {
+    const scanParams = {
+      TableName: 'CityGenres',
+    };
+  
+    try {
+      const result = await dynamodb.scan(scanParams).promise();
+      return result.Items;
+    } catch (error) {
+      console.error('Error fetching all records from DynamoDB:', error);
+      throw new Error('Error fetching all records');
+    }
+  };
+  
 // Main Lambda handler
 exports.handler = async (event) => {
-  try {
-    // Extract the city from the path parameter
-    const city = event.pathParameters.city;
-    const records = await getGenresByCity(city);
-    // Process the retrieved records as needed
-    // For example, you can convert the records to JSON and include them in the response
-    console.log('Genres:', records[0].genres);
-    const topGenres = records && records.length > 0 ? getTopGenres(records[0].genres) : [];
-   
-    // Replace the placeholder with the JSON representation of the records
-    
-    // Include Leaflet script dynamically
-    return {
-        statusCode: 200,
-        headers: {
-          'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*'
-        },
-        body: JSON.stringify(topGenres)
-      };
+    try {
+      const pathParam = event.pathParameters && event.pathParameters.city;
+  
+      if (pathParam === "all-data") {
+        // Fetch and return all data from the database
+        const allData = await getAllData();
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify(allData)
+        };
+      } else {
+        // Existing code to handle individual city data
+        const city = pathParam;
+        const records = await getGenresByCity(city);
+        const topGenres = records && records.length > 0 ? getTopGenres(records[0].genres) : [];
+  
+        return {
+          statusCode: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          },
+          body: JSON.stringify(topGenres)
+        };
+      }
     } catch (error) {
       console.error('Error:', error);
       return {
