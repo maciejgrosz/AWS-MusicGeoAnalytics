@@ -51,7 +51,7 @@ exports.handler = async (event) => {
     const records = await getGenresByCity(city);
     // Process the retrieved records as needed
     // For example, you can convert the records to JSON and include them in the response
-
+    console.log('Genres:', records[0].genres);
     const topGenres = records && records.length > 0 ? getTopGenres(records[0].genres) : [];
    
     // Replace the placeholder with the JSON representation of the records
@@ -60,7 +60,8 @@ exports.handler = async (event) => {
     return {
         statusCode: 200,
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Access-Control-Allow-Origin': '*'
         },
         body: JSON.stringify(topGenres)
       };
