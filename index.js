@@ -49,7 +49,9 @@ const getAllData = async () => {
     };
   
     try {
+      console.log("getalldata-try", scanParams)
       const result = await dynamodb.scan(scanParams).promise();
+      console.log("result", result.Items)
       return result.Items;
     } catch (error) {
       console.error('Error fetching all records from DynamoDB:', error);
@@ -60,11 +62,11 @@ const getAllData = async () => {
 // Main Lambda handler
 exports.handler = async (event) => {
     try {
-      const pathParam = event.pathParameters && event.pathParameters.city;
-  
-      if (pathParam === "all-data") {
+
+      if ( event.path === "/genres/all-data") {
         // Fetch and return all data from the database
         const allData = await getAllData();
+        console.log("allDATA:", allData)
         return {
           statusCode: 200,
           headers: {
@@ -74,6 +76,7 @@ exports.handler = async (event) => {
           body: JSON.stringify(allData)
         };
       } else {
+        const pathParam = event.pathParameters && event.pathParameters.city;
         // Existing code to handle individual city data
         const city = pathParam;
         const records = await getGenresByCity(city);

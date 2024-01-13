@@ -137,7 +137,7 @@
             </select>
             
             <div class="button-container">
-                <button type="button" onclick="compareGenre()">Compare</button>
+                <button type="button" id="compareButton" onclick="compareGenre()" >Compare</button>
             </div>
         </div>
         <div id="map"></div>
@@ -145,7 +145,7 @@
     </main>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/geo-poland.js"></script>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/leaflet.js"></script>
-    <script>
+    <script> 
         document.addEventListener("DOMContentLoaded", function() {
             // Genres to be inserted into the dropdown
             var genres = ["Pop", "Rock", "Techno", "Electronic"];
@@ -162,13 +162,14 @@
     
         function compareGenre() {
             const selectedGenre = document.getElementById("musicGenreDropdown").value;
-
+            resetRegionHighlights();
             // Fetch data for all regions and process it
             // For simplicity, let's assume you have a function fetchAllRegionData() that does this
             fetchAllRegionData().then(allRegionsData => {
                 allRegionsData.forEach(regionData => {
                 if (isGenreInTopFive(selectedGenre, regionData.genres)) {
-                    highlightRegion(regionData.regionName);
+                    // resetRegionHighlights()
+                    highlightRegion(regionData.city);
                 }
                 });
             });
@@ -182,14 +183,50 @@
                 });
             }
 
-        function isGenreInTopFive(genre, genres) {
-            // Implement logic to check if the genre is in the top 5 for the region
-            // This depends on how your genre data is structured
+        function isGenreInTopFive(selectedGenre, genres) {
+            // Convert genres object to an array of [genre, count] pairs
+            const genresArray = Object.entries(genres);
+
+            // Sort the array based on count, in descending order
+            genresArray.sort((a, b) => b[1] - a[1]);
+
+            // Get the top 5 genres
+            const topFiveGenres = genresArray.slice(0, 5).map(item => item[0]);
+            // Check if the selected genre is in the top 5
+            return topFiveGenres.includes(selectedGenre);
         }
 
-        function highlightRegion(regionName) {
-            // Implement logic to highlight the region on the map
-            // This could involve changing the style of the region's layer in Leaflet
+        function mapCityToRegion(city) {
+            let mappedRegion = null;
+
+            // Iterate over the regionToCityMapping to find the matching region
+            for (const region in regionToCityMapping) {
+                if (regionToCityMapping[region].includes(city.toLowerCase())) {
+                mappedRegion = region;
+                break;
+                }
+            }
+
+            return mappedRegion;
+        }
+
+        function highlightRegion(city) {
+            // Log the city to be highlighted
+            // Map the city to its region and log the region
+            const region = mapCityToRegion(city);
+            console.log(regionLayers)
+              // Check if the region layer exists
+            if (regionLayers[region]) {
+                // Apply the highlight style to the layer
+                regionLayers[region].setStyle(highlightStyle);
+            } else {
+                console.log("Region layer not found:", region);
+            }
+        }
+        function resetRegionHighlights() {
+            for (const region in regionLayers) {
+                regionLayers[region].setStyle(defaultStyle);
+            }
         }
     </script>
 </body>

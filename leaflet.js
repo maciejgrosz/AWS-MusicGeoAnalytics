@@ -1,3 +1,18 @@
+// Define a highlight style
+const highlightStyle = {
+  color: '#ff7800', // Example highlight color
+  weight: 5,        // Border weight
+  fillOpacity: 0.7  // Fill opacity
+};
+const defaultStyle = {
+  color: '#3388ff', // Example default color
+  weight: 2,        // Border weight
+  fillOpacity: 0.2  // Fill opacity
+};
+// Keep a reference to all region layers
+regionLayers = {};
+
+
 const map = L.map('map').setView([52.25, 21.0], 7); // Adjust as needed
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -15,6 +30,7 @@ const regionToCityMapping = {
   "Podkarpackie": ["rzeszow"]
 };
 
+
 function fetchGenreData(cityName) {
   return fetch(`https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/${cityName}`)
     .then(response => response.json())
@@ -27,10 +43,10 @@ function fetchGenreData(cityName) {
 
 L.geoJSON(geoData, {
   onEachFeature: function (feature, layer) {
+    const regionName = feature.properties.NAME_1;
+    regionLayers[regionName] = layer;
     layer.on('click', function () {
-      const regionName = feature.properties.NAME_1;
       const cities = regionToCityMapping[regionName];
-
       if (cities && cities.length > 0) {
         Promise.all(cities.map(city => fetchGenreData(city)))
           .then(results => {
@@ -50,6 +66,10 @@ L.geoJSON(geoData, {
         layer.bindPopup(`No data available for ${regionName}`).openPopup();
       }
     });
+  },
+  style: function (feature) {
+    // You can also set a default style for regions here
+    return defaultStyle;
   }
 }).addTo(map);
   
