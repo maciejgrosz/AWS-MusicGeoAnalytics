@@ -1,6 +1,16 @@
 const AWS = require('aws-sdk');
 const dynamodb = new AWS.DynamoDB.DocumentClient();
 
+const regionToCityMapping = {
+    "Mazowieckie": ["warsaw"],
+    "Lodzkie": ["lodz"],
+    "Slaskie": ["katowice", "gliwice"],
+    "Zachodniopomorskie": ["szczecin"],
+    "Wielkopolskie": ["poznan"],
+    "Pomorskie": ["gdansk", "gdynia"],
+    "Malopolskie": ["krakow"],
+    "Podkarpackie": ["rzeszow"]
+  };
 const getGenresByCity = async (city) => {
   const queryParams = {
     TableName: 'CityGenres',
@@ -77,10 +87,35 @@ exports.handler = async (event) => {
         };
       } else {
         const pathParam = event.pathParameters && event.pathParameters.city;
-        // Existing code to handle individual city data
-        const city = pathParam;
-        const records = await getGenresByCity(city);
-        const topGenres = records && records.length > 0 ? getTopGenres(records[0].genres) : [];
+        const region = pathParam;
+        const cities = regionToCityMapping[region];
+          // Check if the region exists in the mapping
+        if (!cities) {
+            return {
+                statusCode: 404,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Access-Control-Allow-Origin': '*'
+                },
+                body: JSON.stringify({ message: `Region '${region}' not found` })
+            };
+        }
+        let mergedData = {};
+    
+        for (const city of cities) {
+          const cityData = await getGenresByCity(city);
+          for (const record of cityData) {
+            for (const [genre, count] of Object.entries(record.genres)) {
+              if (!mergedData[genre]) {
+                mergedData[genre] = 0;
+              }
+              mergedData[genre] += count;
+            }
+          }
+        }
+        const topGenres = getTopGenres(mergedData);
+
+
   
         return {
           statusCode: 200,

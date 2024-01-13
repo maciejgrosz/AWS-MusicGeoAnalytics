@@ -30,41 +30,47 @@ const regionToCityMapping = {
   "Podkarpackie": ["rzeszow"]
 };
 
+function convertRegionName(regionName) {
+  const conversionMap = {
+    'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l',
+    'ń': 'n', 'ó': 'o', 'ś': 's', 'ź': 'z',
+    'ż': 'z', 'Ą': 'A', 'Ć': 'C', 'Ę': 'E',
+    'Ł': 'L', 'Ń': 'N', 'Ó': 'O', 'Ś': 'S',
+    'Ź': 'Z', 'Ż': 'Z'
+  };
 
-function fetchGenreData(cityName) {
-  return fetch(`https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/${cityName}`)
+  return regionName.split('').map(char => conversionMap[char] || char).join('');
+}
+
+function fetchGenreData(regionName) {
+  return fetch(`https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/${regionName}`)
     .then(response => response.json())
     .catch(error => {
       console.error(`Error fetching genre data for ${cityName}:`, error);
       return []; // Return an empty array in case of error
-  
-    });
+
+  });
 }
 
 L.geoJSON(geoData, {
   onEachFeature: function (feature, layer) {
-    const regionName = feature.properties.NAME_1;
+    const regionName = convertRegionName(feature.properties.NAME_1);
     regionLayers[regionName] = layer;
     layer.on('click', function () {
-      const cities = regionToCityMapping[regionName];
-      if (cities && cities.length > 0) {
-        Promise.all(cities.map(city => fetchGenreData(city)))
-          .then(results => {
-            const genreTexts = results.map((genres, index) => {
-              const city = cities[index];
-              const genresList = genres.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
-              return `${city.charAt(0).toUpperCase() + city.slice(1)} - ${genresList}`;
-            }).join('<br>');
-
-            layer.bindPopup(`Top Genres in ${regionName}:<br>${genreTexts}`).openPopup();
-          })
-          .catch(error => {
-            console.error(`Error fetching data for ${regionName}:`, error);
-            layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
-          });
-      } else {
-        layer.bindPopup(`No data available for ${regionName}`).openPopup();
-      }
+      fetchGenreData(regionName)
+        .then(genreData => {
+          // Check if genreData is an array and has elements
+          if (Array.isArray(genreData) && genreData.length > 0) {
+            const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
+            layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
+          } else {
+            layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
+          }
+        })
+        .catch(error => {
+          console.error(`Error fetching data for ${regionName}:`, error);
+          layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
+        });
     });
   },
   style: function (feature) {
@@ -72,4 +78,3 @@ L.geoJSON(geoData, {
     return defaultStyle;
   }
 }).addTo(map);
-  
