@@ -126,100 +126,63 @@
 </head>
 <body>
     <header>
-        <h1 id="genreHeader">Loading genres...</h1> 
+        <h1 id="genreHeader">SOUNDCLOUD GENRE MAP</h1> 
     </header>
     <main>
         <div id="countryPanel">
-            <label>
-                <input type="radio" name="analysisOption" id="regionRadio" onclick="toggleDropdowns()" checked> Compare regions
-            </label>
-            <label>
-                <input type="radio" name="analysisOption" id="genreRadio" onclick="toggleDropdowns()"> Genre analysis
-            </label>
-              <!-- Your Handlebars.js template -->
-              <script id="my-template" type="text/x-handlebars-template">
-                <div id="countryContainer">
-                  <h2>Select Countries to Compare</h2>
-                  <label for="countryList1">Country 1:</label>
-                  <select id="countryList1">
-                      {{#each countries}}
-                          <option value="{{ this }}">{{ this }}</option>
-                      {{/each}}
-                  </select>
-                  <label for="countryList2">Country 2:</label>
-                  <select id="countryList2">
-                      {{#each countries}}
-                          <option value="{{ this }}">{{ this }}</option>
-                      {{/each}}
-                  </select>
-                </div>
-
-                <!-- Container for country dropdowns -->
-                <div id="genreContainer">
-                  <h2>Select genre to analyse</h2>
-                    <label for="musicGenre">Genre:</label>
-                    <select id="musicGenreDropdown">
-                        {{#each genres}}
-                            <option value="{{ this }}">{{ this }}</option>
-                        {{/each}}
-                    </select>
-                </div>
-
-                <div class="button-container">
-                    <button type="button" onclick="compare()">Compare</button>
-                </div>
-                <div id="resultBox"></div>
-              </script>
-              <!-- End of Handlebars.js template -->
+            <h2>Select Genre to Analyse</h2>
+            <label for="musicGenreDropdown">Genre:</label>
+            <select id="musicGenreDropdown">
+                <!-- Genres will be populated here -->
+            </select>
+            
+            <div class="button-container">
+                <button type="button" onclick="compareGenre()">Compare</button>
             </div>
+        </div>
         <div id="map"></div>
 
     </main>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/geo-poland.js"></script>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/leaflet.js"></script>
     <script>
-      // JavaScript to render the Handlebars.js template
-      document.addEventListener("DOMContentLoaded", function() {
-          // Data to be inserted into the template
-          var data = {
-              countries: ["Poland", "USA", "UK", "Germany", "France", "Italy"],
-              genres: ["Pop", "Rock", "Techno"]
-          };
-
-          // Get the template source
-          var templateSource = document.getElementById("my-template").innerHTML;
-
-          // Compile the template
-          var template = Handlebars.compile(templateSource);
-
-          // Render the template with the data
-          var renderedHTML = template(data);
-
-          // Insert the rendered HTML into the DOM
-          document.getElementById("countryPanel").innerHTML += renderedHTML;
-          toggleDropdowns();
-
-      });
-  </script>
-  <script>
-    // Fetches the top genres and updates the header
-    function fetchTopGenresAndUpdateHeader() {
-      const apiEndpoint = 'https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/warsaw';
-      
-      fetch(apiEndpoint)
-        .then(response => response.json())
-        .then(genres => {
-          // Assuming 'genres' is an array of genre objects
-          const topGenresText = genres.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
-          document.getElementById('genreHeader').innerText = `Top Genres in Warsaw: ${topGenresText}`;
-        })
-        .catch(error => {
-          console.error('Error fetching genre data:', error);
-          document.getElementById('genreHeader').innerText = 'Error loading genres';
+        document.addEventListener("DOMContentLoaded", function() {
+            // Genres to be inserted into the dropdown
+            var genres = ["Pop", "Rock", "Techno", "Electronic"];
+    
+            // Populate the genre dropdown
+            var musicGenreDropdown = document.getElementById("musicGenreDropdown");
+            genres.forEach(function(genre) {
+                var option = document.createElement("option");
+                option.value = genre.toLowerCase();
+                option.textContent = genre;
+                musicGenreDropdown.appendChild(option);
+            });
         });
-    }
+    
+        function compareGenre() {
+            const selectedGenre = document.getElementById("musicGenreDropdown").value;
 
-    document.addEventListener('DOMContentLoaded', fetchTopGenresAndUpdateHeader);
-  </script>
+            // Fetch data for all regions and process it
+            // For simplicity, let's assume you have a function fetchAllRegionData() that does this
+            fetchAllRegionData().then(allRegionsData => {
+                allRegionsData.forEach(regionData => {
+                if (isGenreInTopFive(selectedGenre, regionData.genres)) {
+                    highlightRegion(regionData.regionName);
+                }
+                });
+            });
+        }
+
+        function isGenreInTopFive(genre, genres) {
+            // Implement logic to check if the genre is in the top 5 for the region
+            // This depends on how your genre data is structured
+        }
+
+        function highlightRegion(regionName) {
+            // Implement logic to highlight the region on the map
+            // This could involve changing the style of the region's layer in Leaflet
+        }
+    </script>
 </body>
 </html>
