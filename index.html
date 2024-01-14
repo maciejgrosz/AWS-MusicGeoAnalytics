@@ -151,7 +151,43 @@
             <div class="button-container">
                 <button type="button" id="compareButton" onclick="compareGenre()" >Compare</button>
             </div>
-            <textarea id="topGenresBox" rows="10" readonly style="width: 97%; margin-top: 20px; resize: none; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 10px;"></textarea>
+            <!-- Main container for displaying top 10 genres -->
+            <div id="topGenresContainer" style="width: 100%; margin-top: 20px; text-align: center;">
+
+                <!-- Big title -->
+                <h2>Top 10 Genres</h2>
+
+                <!-- Sub-container for the three lists -->
+                <div style="display: flex; justify-content: space-around; align-items: start;">
+
+                    <!-- First list: All data -->
+                    <div>
+                        <h3>All Data:</h3>
+                        <ul id="allDataTopGenres" style="text-align: left;">
+                            <!-- List items for 'All Data' will be added here -->
+                        </ul>
+                    </div>
+
+                    <!-- Second list: Poland -->
+                    <div>
+                        <h3>Poland:</h3>
+                        <ul id="polandTopGenres" style="text-align: left;">
+                            <!-- List items for 'Poland' will be added here -->
+                        </ul>
+                    </div>
+
+                    <!-- Third list: Great Britain -->
+                    <div>
+                        <h3>Great Britain:</h3>
+                        <ul id="greatBritainTopGenres" style="text-align: left;">
+                            <!-- List items for 'Great Britain' will be added here -->
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+            </div>
         </div>
         <div id="map"></div>
 
@@ -213,12 +249,18 @@
             // Get the top 10 genres
             const topGenres = genresArray.slice(0, 10);
 
-            // Format the genres for display
-            const formattedGenres = topGenres.map(([genre, count]) => `${genre}: ${count}`).join('\n');
+            // Get the list element where the top genres will be displayed
+            const listElement = document.getElementById('allDataTopGenres');
+            listElement.innerHTML = ''; // Clear existing list items
 
-            // Display in the text box
-            document.getElementById('topGenresBox').value = formattedGenres;
+            // Create and append list items for each top genre
+            topGenres.forEach(([genre, count], index) => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${index + 1}. ${genre}: ${count}`;
+                listElement.appendChild(listItem);
+            });
         }
+
 
 
         function compareGenre() {
