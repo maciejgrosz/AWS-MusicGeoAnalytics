@@ -13,7 +13,7 @@ const defaultStyle = {
 regionLayers = {};
 
 
-const map = L.map('map').setView([52.25, 21.0], 7); // Adjust as needed
+const map = L.map('map').setView([53.5, 5.0], 5); // New center and zoom level
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
   attribution: '© OpenStreetMap contributors'
@@ -60,26 +60,40 @@ L.geoJSON(geoData, {
   onEachFeature: function (feature, layer) {
     const regionName = convertRegionName(feature.properties.NAME_1);
     regionLayers[regionName] = layer;
-    layer.on('click', function () {
-      fetchGenreData(regionName)
-        .then(genreData => {
-          // Check if genreData is an array and has elements
-          if (Array.isArray(genreData) && genreData.length > 0) {
-            const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
-            layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
-          } else {
-            layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
-          }
-        })
-        .catch(error => {
-          console.error(`Error fetching data for ${regionName}:`, error);
-          layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
-        });
-    });
+    if (regionToCityMapping.hasOwnProperty(regionName)) {
+      layer.on('click', function () {
+        fetchGenreData(regionName)
+          .then(genreData => {
+            // Check if genreData is an array and has elements
+            if (Array.isArray(genreData) && genreData.length > 0) {
+              const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
+              layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
+            } else {
+              layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
+            }
+          })
+          .catch(error => {
+            console.error(`Error fetching data for ${regionName}:`, error);
+            layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
+          });
+      });
+    }
   },
   style: function (feature) {
-    // You can also set a default style for regions here
-    return defaultStyle;
+    const regionName = convertRegionName(feature.properties.NAME_1);
+
+    // Check if the region is in the regionToCityMapping
+    if (!regionToCityMapping.hasOwnProperty(regionName)) {
+      // Style for regions not in the mapping
+      return {
+        color: '#808080', // Gray color
+        weight: 2,       // Border weight
+        fillOpacity: 0.5 // Fill opacity
+      };
+    } else {
+      // Default style for regions in the mapping
+      return defaultStyle;
+    }
   }
 }).addTo(map);
 
@@ -89,25 +103,39 @@ L.geoJSON(geoDataGb, {
   onEachFeature: function (feature, layer) {
     const regionName = convertRegionName(feature.properties.NAME_1);
     regionLayers[regionName] = layer;
-    layer.on('click', function () {
-      fetchGenreData(regionName)
-        .then(genreData => {
-          // Check if genreData is an array and has elements
-          if (Array.isArray(genreData) && genreData.length > 0) {
-            const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
-            layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
-          } else {
-            layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
-          }
-        })
-        .catch(error => {
-          console.error(`Error fetching data for ${regionName}:`, error);
-          layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
-        });
-    });
+    if (regionToCityMapping.hasOwnProperty(regionName)) {
+      layer.on('click', function () {
+        fetchGenreData(regionName)
+          .then(genreData => {
+            // Check if genreData is an array and has elements
+            if (Array.isArray(genreData) && genreData.length > 0) {
+              const genreText = genreData.map(genre => `${genre.genre}: ${genre.count}`).join(', ');
+              layer.bindPopup(`Top Genres in ${regionName}:<br>${genreText}`).openPopup();
+            } else {
+              layer.bindPopup(`No genre data available for ${regionName}`).openPopup();
+            }
+          })
+          .catch(error => {
+            console.error(`Error fetching data for ${regionName}:`, error);
+            layer.bindPopup(`Error loading genre data for ${regionName}`).openPopup();
+          });
+      });
+    }
   },
   style: function (feature) {
-    // You can also set a default style for regions here
-    return defaultStyle;
+    const regionName = convertRegionName(feature.properties.NAME_1);
+
+    // Check if the region is in the regionToCityMapping
+    if (!regionToCityMapping.hasOwnProperty(regionName)) {
+      // Style for regions not in the mapping
+      return {
+        color: '#808080', // Gray color
+        weight: 2,       // Border weight
+        fillOpacity: 0.5 // Fill opacity
+      };
+    } else {
+      // Default style for regions in the mapping
+      return defaultStyle;
+    }
   }
 }).addTo(map);

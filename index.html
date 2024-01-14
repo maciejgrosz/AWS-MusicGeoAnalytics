@@ -91,6 +91,18 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
 
     </style>
     <script>
@@ -139,6 +151,7 @@
             <div class="button-container">
                 <button type="button" id="compareButton" onclick="compareGenre()" >Compare</button>
             </div>
+            <textarea id="topGenresBox" rows="10" readonly style="width: 97%; margin-top: 20px; resize: none; font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6; padding: 10px;"></textarea>
         </div>
         <div id="map"></div>
 
@@ -149,6 +162,9 @@
     <script> 
         document.addEventListener("DOMContentLoaded", function() {
             // Genres to be inserted into the dropdown
+            fetchAllRegionData().then(allRegionsData => {
+                displayTopGenres(allRegionsData);
+            });
             var genres = [
                 "pop", "rock", "jazz", "blues", "country", "rnb",
                 "electronic", "classical", "folk", "reggae", "punk", "metal", "indie", "soul",
@@ -166,7 +182,45 @@
                 musicGenreDropdown.appendChild(option);
             });
         });
-    
+        function fetchTopGenres() {
+            fetch('https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/all-data')
+                .then(response => response.json())
+                .then(data => displayTopGenres(data))
+                .catch(error => console.error('Error fetching top genres:', error));
+        }
+
+        function displayTopGenres(data) {
+            // Process each city's genres
+            const allGenres = {};
+
+            data.forEach(regionData => {
+                // Extract genres for each city and accumulate counts
+                Object.entries(regionData.genres).forEach(([genre, count]) => {
+                    if (allGenres[genre]) {
+                        allGenres[genre] += count;
+                    } else {
+                        allGenres[genre] = count;
+                    }
+                });
+            });
+
+            // Convert the accumulated genres object to an array of [genre, count] pairs
+            const genresArray = Object.entries(allGenres);
+
+            // Sort the array based on count, in descending order
+            genresArray.sort((a, b) => b[1] - a[1]);
+
+            // Get the top 10 genres
+            const topGenres = genresArray.slice(0, 10);
+
+            // Format the genres for display
+            const formattedGenres = topGenres.map(([genre, count]) => `${genre}: ${count}`).join('\n');
+
+            // Display in the text box
+            document.getElementById('topGenresBox').value = formattedGenres;
+        }
+
+
         function compareGenre() {
             const selectedGenre = document.getElementById("musicGenreDropdown").value;
             resetRegionHighlights();
@@ -197,7 +251,7 @@
             // Sort the array based on count, in descending order
             genresArray.sort((a, b) => b[1] - a[1]);
 
-            // Get the top 5 genres
+            // Get the top 10 genres
             const topFiveGenres = genresArray.slice(0, 10).map(item => item[0]);
             // Check if the selected genre is in the top 10
             return topFiveGenres.includes(selectedGenre);
@@ -232,7 +286,20 @@
         }
         function resetRegionHighlights() {
             for (const region in regionLayers) {
-                regionLayers[region].setStyle(defaultStyle);
+                const layer = regionLayers[region];
+
+                // Check if the region is in the regionToCityMapping
+                if (!regionToCityMapping.hasOwnProperty(region)) {
+                    // Style for regions not in the mapping
+                    layer.setStyle({
+                        color: '#808080', // Gray color
+                        weight: 2,       // Border weight
+                        fillOpacity: 0.5 // Fill opacity
+                    });
+                } else {
+                    // Default style for regions in the mapping
+                    layer.setStyle(defaultStyle);
+                }
             }
         }
     </script>
