@@ -228,23 +228,53 @@
             // For simplicity, let's assume you have a function fetchAllRegionData() that does this
             fetchAllRegionData().then(allRegionsData => {
                 allRegionsData.forEach(regionData => {
-                if (isGenreInTopFive(selectedGenre, regionData.genres)) {
-                    // resetRegionHighlights()
+                if (isGenreInTopTen(selectedGenre, regionData.genres)) {
                     highlightRegion(regionData.city);
                 }
+
                 });
             });
         }
+        function mergeGenres(genres1, genres2) {
+            const merged = {...genres1}; // Copy genres1 into merged
+            for (const genre in genres2) {
+                if (merged[genre]) {
+                    merged[genre] += genres2[genre]; // Add counts if genre already exists
+                } else {
+                    merged[genre] = genres2[genre]; // Initialize if genre doesn't exist
+                }
+            }
+            return merged;
+        }
+
         function fetchAllRegionData() {
             return fetch('https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/all-data')
                 .then(response => response.json())
+                .then(allCitiesData => {
+                    const regionData = {};
+                    allCitiesData.forEach(cityData => {
+                        for (const region in regionToCityMapping) {
+                            if (regionToCityMapping[region].includes(cityData.city)) {
+                                if (regionData[region]) {
+                                    // Merge genres for cities within the same region
+                                    regionData[region].genres = mergeGenres(regionData[region].genres, cityData.genres);
+                                } else {
+                                    // Initialize region data with the first city's data
+                                    regionData[region] = { ...cityData, city: region };
+                                }
+                                break;
+                            }
+                        }
+                    });
+                    return Object.values(regionData); // Convert regionData object to array
+                })
                 .catch(error => {
                     console.error('Error fetching all region data:', error);
                     return []; // Return an empty array in case of error
                 });
-            }
+        }
 
-        function isGenreInTopFive(selectedGenre, genres) {
+        function isGenreInTopTen(selectedGenre, genres) {
             // Convert genres object to an array of [genre, count] pairs
             const genresArray = Object.entries(genres);
 
@@ -252,9 +282,9 @@
             genresArray.sort((a, b) => b[1] - a[1]);
 
             // Get the top 10 genres
-            const topFiveGenres = genresArray.slice(0, 10).map(item => item[0]);
+            const topTenGenres = genresArray.slice(0, 10).map(item => item[0]);
             // Check if the selected genre is in the top 10
-            return topFiveGenres.includes(selectedGenre);
+            return topTenGenres.includes(selectedGenre);
         }
 
         function mapCityToRegion(city) {
@@ -271,11 +301,7 @@
             return mappedRegion;
         }
 
-        function highlightRegion(city) {
-            // Log the city to be highlighted
-            // Map the city to its region and log the region
-            const region_unconverted = mapCityToRegion(city);
-            const region = convertRegionName(region_unconverted);
+        function highlightRegion(region) {
               // Check if the region layer exists
             if (regionLayers[region]) {
                 // Apply the highlight style to the layer
