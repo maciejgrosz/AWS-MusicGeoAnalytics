@@ -10,7 +10,7 @@ table_name = 'CityGenres'
 table = dynamodb.Table(table_name)
 
 # Load the JSON data from the file
-file_name = 'GB_DATA.json'
+file_name = 'GB_DATA_RAP.json'
 with open(file_name, 'r', encoding='utf-8') as file:
     city_genres_data = json.load(file)
 

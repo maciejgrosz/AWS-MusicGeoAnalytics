@@ -33,7 +33,10 @@ const regionToCityMapping = {
   "Wales": ["cardiff", "swansea"],
   "Northern_Ireland": ["belfast", "londonderry"]
 };
-
+const countryToRegionMapping = {
+  "Poland": ["Mazowieckie", "Lodzkie", "Slaskie", "Zachodniopomorskie", "Wielkopolskie", "Pomorskie", "Malopolskie", "Podkarpackie"],
+  "GreatBritain": ["England", "Scotland", "Wales", "Northern_Ireland"]
+};
 function convertRegionName(regionName) {
   const conversionMap = {
     'ą': 'a', 'ć': 'c', 'ę': 'e', 'ł': 'l',

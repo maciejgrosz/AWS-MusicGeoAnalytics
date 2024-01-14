@@ -196,11 +196,19 @@
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/geo-poland.js"></script>
     <script src="https://tass-musicgeoanalyser.s3.eu-west-1.amazonaws.com/leaflet.js"></script>
     <script> 
+
         document.addEventListener("DOMContentLoaded", function() {
             // Genres to be inserted into the dropdown
+            var summedGenres = {}
             fetchAllRegionData().then(allRegionsData => {
-                displayTopGenres(allRegionsData);
+                summedGenres = sumGenresByCountry(allRegionsData, countryToRegionMapping);
+                console.log("summedGenres", summedGenres)
+
+                displayTopGenresForCountry(allRegionsData, 'All', 'allDataTopGenres');
+                displayTopGenresForCountry(summedGenres['Poland'], 'Poland', 'polandTopGenres');
+                displayTopGenresForCountry(summedGenres['GreatBritain'], 'Great Britain', 'greatBritainTopGenres');
             });
+
             var genres = [
                 "pop", "rock", "jazz", "blues", "country", "rnb",
                 "electronic", "classical", "folk", "reggae", "punk", "metal", "indie", "soul",
@@ -218,41 +226,57 @@
                 musicGenreDropdown.appendChild(option);
             });
         });
-        function fetchTopGenres() {
-            fetch('https://fzk6hts2n3.execute-api.eu-west-1.amazonaws.com/test/genres/all-data')
-                .then(response => response.json())
-                .then(data => displayTopGenres(data))
-                .catch(error => console.error('Error fetching top genres:', error));
-        }
+        function sumGenresByCountry(data, countryToRegionMapping) {
+            let countryGenreSums = {};
 
-        function displayTopGenres(data) {
-            // Process each city's genres
-            const allGenres = {};
+            for (const country in countryToRegionMapping) {
+                let genresSum = {};
 
-            data.forEach(regionData => {
-                // Extract genres for each city and accumulate counts
-                Object.entries(regionData.genres).forEach(([genre, count]) => {
-                    if (allGenres[genre]) {
-                        allGenres[genre] += count;
-                    } else {
-                        allGenres[genre] = count;
+                countryToRegionMapping[country].forEach(region => {
+                    let regionData = data.find(d => d.city === region);
+                    if (regionData) {
+                        Object.entries(regionData.genres).forEach(([genre, count]) => {
+                            if (genresSum[genre]) {
+                                genresSum[genre] += count;
+                            } else {
+                                genresSum[genre] = count;
+                            }
+                        });
                     }
                 });
-            });
 
-            // Convert the accumulated genres object to an array of [genre, count] pairs
-            const genresArray = Object.entries(allGenres);
+                countryGenreSums[country] = genresSum;
+            }
 
-            // Sort the array based on count, in descending order
-            genresArray.sort((a, b) => b[1] - a[1]);
+            return countryGenreSums;
+        }
 
-            // Get the top 10 genres
+        function displayTopGenresForCountry(data, countryName, elementId) {
+            let allGenres = {};
+
+            if (countryName === "All") {
+                // Process each city's genres for 'All'
+                data.forEach(regionData => {
+                    Object.entries(regionData.genres).forEach(([genre, count]) => {
+                        if (allGenres[genre]) {
+                            allGenres[genre] += count;
+                        } else {
+                            allGenres[genre] = count;
+                        }
+                    });
+                });
+            } else {
+                // Use pre-summed genres for specific countries
+                allGenres = data;
+            }
+
+            // Sort and get the top 10 genres
+            const genresArray = Object.entries(allGenres).sort((a, b) => b[1] - a[1]);
             const topGenres = genresArray.slice(0, 10);
 
-            // Get the list element where the top genres will be displayed
-            const listElement = document.getElementById('allDataTopGenres');
+            // Display in the specified list element
+            const listElement = document.getElementById(elementId);
             listElement.innerHTML = ''; // Clear existing list items
-
             // Create and append list items for each top genre
             topGenres.forEach(([genre, count], index) => {
                 const listItem = document.createElement('li');
@@ -260,8 +284,6 @@
                 listElement.appendChild(listItem);
             });
         }
-
-
 
         function compareGenre() {
             const selectedGenre = document.getElementById("musicGenreDropdown").value;
@@ -329,19 +351,19 @@
             return topTenGenres.includes(selectedGenre);
         }
 
-        function mapCityToRegion(city) {
-            let mappedRegion = null;
+        // function mapCityToRegion(city) {
+        //     let mappedRegion = null;
 
-            // Iterate over the regionToCityMapping to find the matching region
-            for (const region in regionToCityMapping) {
-                if (regionToCityMapping[region].includes(city.toLowerCase())) {
-                mappedRegion = region;
-                break;
-                }
-            }
+        //     // Iterate over the regionToCityMapping to find the matching region
+        //     for (const region in regionToCityMapping) {
+        //         if (regionToCityMapping[region].includes(city.toLowerCase())) {
+        //         mappedRegion = region;
+        //         break;
+        //         }
+        //     }
 
-            return mappedRegion;
-        }
+        //     return mappedRegion;
+        // }
 
         function highlightRegion(region) {
               // Check if the region layer exists
