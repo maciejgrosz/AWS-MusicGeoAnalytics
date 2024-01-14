@@ -91,7 +91,7 @@ exports.handler = async (event) => {
           body: JSON.stringify(allData)
         };
       } else {
-        const pathParam = event.pathParameters && event.pathParameters.city;
+        const pathParam = event.pathParameters && event.pathParameters.region;
         const region = pathParam;
         const cities = regionToCityMapping[region];
           // Check if the region exists in the mapping
